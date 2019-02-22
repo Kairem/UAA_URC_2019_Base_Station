@@ -1,4 +1,4 @@
-#!/bin/python
+#Sample code found on the internet, used to initially get started with wxPython
 """
 Hello World, but with more meat.
 """
