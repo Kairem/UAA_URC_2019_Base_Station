@@ -1,5 +1,6 @@
 import wx
-
+#THIS IS ON BRANCH 1
+branch1 = True
 class MyFrame(wx.Frame):
 
     #Constructor for the main frame of the application
