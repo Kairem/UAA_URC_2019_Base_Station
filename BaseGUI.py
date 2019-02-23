@@ -1,5 +1,7 @@
 import wx
 
+thisthing = 5
+
 class MyFrame(wx.Frame):
 
     #Constructor for the main frame of the application
