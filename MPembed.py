@@ -1,4 +1,5 @@
 """
+Chandra's Original Class
 	MPembed: simple mplayer wrapper for embedding
 		MPembed(wid,opts) - constructor, starts mplayer instance in idle, embedded into window wid, options list opts
 		~MPembed() - destructor, terminates mplayer instance

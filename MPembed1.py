@@ -11,19 +11,21 @@
 
 import subprocess as sp
 
-class MPembed():
+class MPembed():#'{} {}'.format("-wid", str(wid))
 	def __init__(self,wid,opts=[]):
-		self.inst=sp.Popen(['C:\\mplayer\\MPlayer-x86_64-r38116+gf4cf6ba8c9\\mplayer.exe', "C:\\video.mov"])
+		#self.inst = sp.Popen(['C:\\mplayer\\MPlayer-x86_64-r38116+gf4cf6ba8c9\\mplayer.exe', "R\\LuckyStarOp.mp4", "-slave", "-wid", str(wid)], stdin=sp.PIPE, universal_newlines=True)
+		self.inst = sp.Popen(['C:\\mplayer\\MPlayer-x86_64-r38116+gf4cf6ba8c9\\mplayer.exe', "-slave", "-wid", str(wid)] +opts, stdin=sp.PIPE, universal_newlines=True)
 	def __del__(self):
-		self.inst.stdin.write('quit\n')
+		#self.inst.stdin.write('quit\n')
+		self.inst.communicate('quit\n')
 		self.inst.wait()
 	def load(self,fl):
-		self.inst.stdin.write('loadfile %s\n'%fl)
+		self.inst.communicate('loadfile %s\n'%fl)
 	def unload(self):
-		self.inst.stdin.write('stop\n')
+		self.inst.communicate('stop\n')#it works!
 	def capture(self):
-		self.inst.stdin.write('screenshot 0\n')
+		self.inst.communicate('screenshot 0\n')
 	def pause(self):
-		self.inst.stdin.write('pause\n')
+		self.inst.communicate('pause\n')
 	def fullscreen(self):
-		self.inst.stdin.write('vo_fullscreen\n')
+		self.inst.communicate('vo_fullscreen\n')

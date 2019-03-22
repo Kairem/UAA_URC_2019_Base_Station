@@ -1,6 +1,7 @@
 import wx
 from ConnectionWindow import ConnectionWindow
 from CameraPanel import CameraPanel
+import MPembed1 as mp
 # look into mplayer for wxPy cam integration
 class MyFrame(wx.Frame):
 
@@ -81,7 +82,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnCamera3, camera3Item)
         self.Bind(wx.EVT_MENU, self.OnCamera4, camera4Item)
         self.Bind(wx.EVT_MENU, self.OnCamera5, camera5Item)
-        #Alternatively just bind everything to one OnCamera() and pass cameraItem to tell what was selecteced
+        #Alternatively just bind everything to one OnCamera() and pass cameraItem to tell what was selected
 
         #Place for future map
         map_menu = wx.Menu()
@@ -101,13 +102,14 @@ class MyFrame(wx.Frame):
     def onJoyEvent(self, event):
         print("Joystick event")
 
-    #Placeholder Functions that are acticated by the Menu Items
+    #Placeholder Functions that are activated by the Menu Items
     def onConnection(self, event):
         print("Connecting to the rover...")
         self.connection_window.Show()
 
     def OnCamera1(self, event):
         print("You have swtiched to Camera #1")
+        self.camera_panel.StartPlayer()
     
     def OnCamera2(self, event):
         print("You have swtiched to Camera #2")
@@ -169,13 +171,6 @@ class ButtonPanel(wx.Panel):
         print("clicked")
         self.clicks += 1
         self.text.SetLabel("Static Text Test\nButton Clicks: " + str(self.clicks))
-
-    """def __do_layout(self):
-        frame_sizer = wx.BoxSizer(wx.VERTICAL)
-        frame_sizer.Add(self.splitter, 1, wx.ALL, 10)
-        self.SetSizer(frame_sizer)
-        frame_sizer.Fit(self)
-        self.splitter.SplitVertically(self.panel1, self.panel2, 0)"""
 
 #def onButtonDown(evt):
 #    print("a button was pressed")
