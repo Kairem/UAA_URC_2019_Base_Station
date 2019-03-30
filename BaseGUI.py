@@ -2,6 +2,7 @@ import wx
 from ConnectionWindow import ConnectionWindow
 from CameraPanel import CameraPanel
 import MPembed1 as mp
+from GamePadEvents import GamePadEvents
 # look into mplayer for wxPy cam integration
 class MyFrame(wx.Frame):
 
@@ -61,6 +62,13 @@ class MyFrame(wx.Frame):
 
         #Move the frame to the center of the screen, could also use self.Move(x, y) to move window
         self.Center()
+
+        ###############################
+        #Inputs testing section
+        self.gpe = GamePadEvents(self)
+        self.Bind(self.gpe.EVT_GPButton, self.OnXBoxButton)
+        self.Bind(self.gpe.EVT_GPRStickX, self.OnXBoxRStickX)
+        self.Bind(self.gpe.EVT_GPRStickY, self.OnXBoxRStickY)
     
     def createMenubar(self):
         #Create a Connection Menu
@@ -109,7 +117,7 @@ class MyFrame(wx.Frame):
 
     def OnCamera1(self, event):
         print("You have swtiched to Camera #1")
-        self.camera_panel.StartPlayer()
+        self.camera_panel.StartPlayer(["udp://239.0.0.20:8080"])
     
     def OnCamera2(self, event):
         print("You have swtiched to Camera #2")
@@ -122,6 +130,26 @@ class MyFrame(wx.Frame):
 
     def OnCamera5(self, event):
         print("You have swtiched to Camera #5")
+
+    ###XBOX TEST: Bind A button to this function
+    def OnXBoxButton(self, event):
+        if (event.button == 'a'):
+            print("a was pressed")
+        elif (event.button == 'b'):
+            print ("b was pressed")
+        elif (event.button == 'x'):
+            print ("x was pressed")
+            self.camera_panel
+            #self.camera_panel.StartPlayer(["udp://192.168.1.129:8080"])
+        elif (event.button == 'y'):
+            print ("y was pressed")
+            #self.camera_panel.StartPlayer("R\\video.mov")
+    
+    def OnXBoxRStickX(self, event):
+        print("X: " + str(event.x))
+    
+    def OnXBoxRStickY(self, event):
+        print("Y: " + str(event.y))
 
 class SensorPanel(wx.Panel):
     def __init__(self, parent):
@@ -180,7 +208,5 @@ app = wx.App()
 #Instantiate the class that is the main frame, the contructor will call Show() so that it appears when run
 frame = MyFrame()
 frame.Show()
-
-#frame.Bind(wx.EVT_JOYSTICK_EVENTS, onButtonDown)
 
 app.MainLoop()

@@ -8,5 +8,5 @@ class CameraPanel(wx.Panel):
 
         self.whnd = self.GetHandle()
                 
-    def StartPlayer(self):
-        self.player = mp.MPembed(self.whnd, ["R\\LuckyStarOp.mp4"])
+    def StartPlayer(self, videoPath):
+        self.player = mp.MPembed(self.whnd, [videoPath])

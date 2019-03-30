@@ -19,9 +19,13 @@ def stickMap(minOut, maxOut, x):
     return round( (x + 32000) * (maxOut - minOut) / (32000 + 32000) + minOut, 2)
 
 
-
+#Left Stick: ABS_X ABS_Y || Right Stick: ABS_RX ABS__RY
+#Butons: BTN_[cardinal] (BTN_EAST) || Button State: 1 is down, 0 is up
 while 1:
     events = inputs.get_gamepad()
     for evt in events:
-        if evt.code == "ABS_Y":
-            print(stickMap(-1, 1, evt.state))
+        #if evt.code == "ABS_RX":
+            #print(stickMap(-1, 1, evt.state))
+        print(evt.code)
+        #if (evt.code == 'BTN_SOUTH'):
+            #print(evt.state)
