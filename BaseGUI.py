@@ -1,74 +1,88 @@
 import wx
+
+from Panels.CameraPanel import CameraPanel
+from Panels.ButtonPanel import ButtonPanel
+from Panels.SensorPanel import SensorPanel
+from Panels.MapPanel import MapPanel
+
 from ConnectionWindow import ConnectionWindow
-from CameraPanel import CameraPanel
+
 import MPembed1 as mp
 from GamePadEvents import GamePadEvents
-# look into mplayer for wxPy cam integration
+
+
 class MyFrame(wx.Frame):
 
-    #Constructor for the main frame of the application
     def __init__(self):
 
-        #call the super constructor and initialize with no parent and title parameter
+        ####call the super constructor and initialize with no parent and title parameter
         wx.Frame.__init__(self, None, -1, "Base Station", size=(1200,700))#(800,450))
 
-        #Set the background color of the frame, rgb(22,149,229) is a cool blue I found on the robotics website
+        ####Set the background color of the frame, rgb(22,149,229) is a cool blue I found on the robotics website
         self.SetBackgroundColour(wx.Colour(22, 149, 229, 255))
 
-        #Set the little icon at the top of the window, current icon also stolen from the robotics website
+        ###Set the little icon at the top of the window, current icon also stolen from the robotics website
         icon = wx.Icon("R/UAAIceBerg.png", wx.BITMAP_TYPE_PNG)
         self.SetIcon(icon)
 
-        #Create the status bar at the bottom
+        ###Create the status bar at the bottom
         status_bar = self.CreateStatusBar()
         status_bar.SetBackgroundColour(wx.Colour(30, 180, 230))
 
-        #Create Menu Bar
+        ###Create Menu Bar
         self.createMenubar()
 
-        #####Create all Panels and Sizers
+        ##### Create All Panels #####
 
-        #Initialize the frames Box Sizer, this component allows panels to be added (with BoxSizer.Add())
-        self.frame_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        #self.camera_panel = wx.Panel(self)
         self.camera_panel = CameraPanel(self)
-        self.frame_sizer.Add(self.camera_panel, 2, wx.EXPAND | wx.ALL, 5)
-
-        self.panel1 = ButtonPanel(self)
-        self.frame_sizer.Add(self.panel1, 1, wx.EXPAND | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)# the second parameter is like a ratio how how much screen should be taken up
-
-        self.panel2 = SensorPanel(self)
-        self.frame_sizer.Add(self.panel2, 1, wx.EXPAND | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
+        self.button_panel = ButtonPanel(self)
+        self.sensor_panel = SensorPanel(self)
+        self.status_panel = wx.Panel(self)
+        self.map_panel = MapPanel(self)
 
         self.connection_window = ConnectionWindow()
 
-        #self.SetSizer(self.frame_sizer)
+        ##### Create Sizers for Panels #####
+
+        ###Initialize the frames Box Sizer, this component allows panels to be added (with BoxSizer.Add())
+        self.frame_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.frame_sizer.Add(self.camera_panel, 2, wx.EXPAND | wx.ALL, 5)
+        self.frame_sizer.Add(self.sensor_panel, 1, wx.EXPAND | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)# the second parameter is like a ratio how how much screen should be taken up
+        #self.frame_sizer.Add(self.sensor_panel, 1, wx.EXPAND | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
+
+        self.map_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.map_sizer.Add(self.map_panel, 1, wx.EXPAND)
+        self.map_sizer.Add(0, 5, 0)
+        self.map_sizer.Add(self.button_panel, 1, wx.EXPAND)
+        self.frame_sizer.Add(self.map_sizer, 1, wx.EXPAND | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
 
         self.frame_vsizer = wx.BoxSizer(wx.VERTICAL)
         self.frame_vsizer.Add(self.frame_sizer, 3, wx.EXPAND)
-
-        self.status_panel = wx.Panel(self)
         self.frame_vsizer.Add(self.status_panel, 1, wx.EXPAND  | wx.LEFT |  wx.RIGHT, 5)
 
         self.SetSizer(self.frame_vsizer)
 
-        #Configure those subs
-        #self.__do_layout()
-        self.panel1.SetBackgroundColour(wx.Colour(51, 102, 204))
-        self.panel2.SetBackgroundColour(wx.Colour(51, 102, 204))
-        #self.camera_panel.SetBackgroundColour(wx.Colour(153, 194, 255))
+        ###Configure Those Sub-Panels
+        self.button_panel.SetBackgroundColour(wx.Colour(51, 102, 204))
+        self.sensor_panel.SetBackgroundColour(wx.Colour(51, 102, 204))
         self.status_panel.SetBackgroundColour(wx.Colour(51, 102, 204))
 
-        #Move the frame to the center of the screen, could also use self.Move(x, y) to move window
+        ###Move the frame to the center of the screen, could also use self.Move(x, y) to move window
         self.Center()
 
-        ###############################
-        #Inputs testing section
+        ##### Frame Bindings #####
+
+        ###Bind functions to the X button for properly closing the frame
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
+
+        ###Input Binding
         self.gpe = GamePadEvents(self)
         self.Bind(self.gpe.EVT_GPButton, self.OnXBoxButton)
         self.Bind(self.gpe.EVT_GPRStickX, self.OnXBoxRStickX)
         self.Bind(self.gpe.EVT_GPRStickY, self.OnXBoxRStickY)
+        self.Bind(self.gpe.EVT_GPLTrigger, self.OnXBoxLTrigger)
+        self.Bind(self.gpe.EVT_GPRTrigger, self.OnXBoxRTrigger)
+
     
     def createMenubar(self):
         #Create a Connection Menu
@@ -118,9 +132,11 @@ class MyFrame(wx.Frame):
     def OnCamera1(self, event):
         print("You have swtiched to Camera #1")
         self.camera_panel.StartPlayer(["udp://239.0.0.20:8080"])
+        #self.camera_panel.StartPlayer("R\\LuckyStarOp.mp4")
     
     def OnCamera2(self, event):
         print("You have swtiched to Camera #2")
+        self.camera_panel.StartPlayer("R\\video.mov")
     
     def OnCamera3(self, event):
         print("You have swtiched to Camera #3")
@@ -139,7 +155,6 @@ class MyFrame(wx.Frame):
             print ("b was pressed")
         elif (event.button == 'x'):
             print ("x was pressed")
-            self.camera_panel
             #self.camera_panel.StartPlayer(["udp://192.168.1.129:8080"])
         elif (event.button == 'y'):
             print ("y was pressed")
@@ -150,55 +165,17 @@ class MyFrame(wx.Frame):
     
     def OnXBoxRStickY(self, event):
         print("Y: " + str(event.y))
+    
+    def OnXBoxLTrigger(self, event):
+        print("LT: " + str(event.value))
 
-class SensorPanel(wx.Panel):
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent)
-        self.SetForegroundColour(wx.Colour(255, 255, 255))
-        self.font = wx.Font()
-        self.font.SetPointSize(50)
-        self.font.Scale(2)
-        self.SetFont(self.Font)
+    def OnXBoxRTrigger(self, event):
+        print("RT: " + str(event.value))
 
-        self.title = wx.StaticText(self, label="Sensor Data:")
-        self.sensor_1 = wx.StaticText(self, label="Sensor 1: xx.xxx")
-        self.sensor_2 = wx.StaticText(self, label="Sensor 2: xx.xxx")
-        self.sensor_3 = wx.StaticText(self, label="Sensor 3: xx.xxx")
-        self.sensor_4 = wx.StaticText(self, label="Sensor 4: [xx, yy]")
-        self.sensor_5 = wx.StaticText(self, label="Sensor 5: true")
-
-        self.main_box_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.main_box_sizer.Add(self.title, 1, wx.EXPAND)
-        self.main_box_sizer.Add(self.sensor_1, 1, wx.EXPAND)
-        self.main_box_sizer.Add(self.sensor_2, 1, wx.EXPAND)
-        self.main_box_sizer.Add(self.sensor_3, 1, wx.EXPAND)
-        self.main_box_sizer.Add(self.sensor_4, 1, wx.EXPAND)
-        self.main_box_sizer.Add(self.sensor_5, 1, wx.EXPAND)
-
-        self.SetSizer(self.main_box_sizer)
-
-class ButtonPanel(wx.Panel):
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent)
-        self.SetForegroundColour(wx.Colour(255,255,255))
-        
-        self.clicks = 0
-        self.text = wx.StaticText(self, label="Static Text Test\nButton Clicks: " + str(self.clicks))
-
-        self.button = wx.Button(self, wx.ID_ANY, "Test")
-
-        self.button_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.button_sizer.Add(self.button, 1)
-        self.button_sizer.Add(self.text, 9)
-
-        self.SetSizer(self.button_sizer)
-
-        self.button.Bind(wx.EVT_BUTTON, self.onClicked)
-
-    def onClicked(self, event):
-        print("clicked")
-        self.clicks += 1
-        self.text.SetLabel("Static Text Test\nButton Clicks: " + str(self.clicks))
+    ### Run when frame is closed
+    def OnClose(self, event):
+        self.gpe.StopListening()
+        self.Destroy()
 
 #def onButtonDown(evt):
 #    print("a button was pressed")

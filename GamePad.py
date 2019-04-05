@@ -21,11 +21,13 @@ def stickMap(minOut, maxOut, x):
 
 #Left Stick: ABS_X ABS_Y || Right Stick: ABS_RX ABS__RY
 #Butons: BTN_[cardinal] (BTN_EAST) || Button State: 1 is down, 0 is up
+#Bumpers: BTN_TL, BTN_TR
+#Triggers: ABS_Z, ABS_RZ value:0-255
 while 1:
     events = inputs.get_gamepad()
     for evt in events:
         #if evt.code == "ABS_RX":
             #print(stickMap(-1, 1, evt.state))
-        print(evt.code)
-        #if (evt.code == 'BTN_SOUTH'):
-            #print(evt.state)
+        #print(evt.code)
+        if (evt.code == 'ABS_Z'):
+            print(evt.state)
