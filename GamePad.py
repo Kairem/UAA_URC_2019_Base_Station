@@ -29,5 +29,5 @@ while 1:
         #if evt.code == "ABS_RX":
             #print(stickMap(-1, 1, evt.state))
         #print(evt.code)
-        if (evt.code == 'ABS_Z'):
+        if (evt.code == 'ABS_HAT0Y'):
             print(evt.state)

@@ -2,7 +2,7 @@ import wx
 
 class ConnectionWindow(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, -1, "Connection Settings")#, size=(800,450))
+        wx.Frame.__init__(self, None, -1, "Connection Settings", size=(350,100))
         self.SetBackgroundColour(wx.Colour(22, 149, 229, 255))
         self.SetForegroundColour(wx.Colour(255, 255, 255))
 

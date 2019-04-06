@@ -46,15 +46,15 @@ class MyFrame(wx.Frame):
 
         ###Initialize the frames Box Sizer, this component allows panels to be added (with BoxSizer.Add())
         self.frame_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.frame_sizer.Add(self.camera_panel, 2, wx.EXPAND | wx.ALL, 5)
+        self.frame_sizer.Add(self.camera_panel, 3, wx.EXPAND | wx.ALL, 5)
         self.frame_sizer.Add(self.sensor_panel, 1, wx.EXPAND | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)# the second parameter is like a ratio how how much screen should be taken up
         #self.frame_sizer.Add(self.sensor_panel, 1, wx.EXPAND | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
 
         self.map_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.map_sizer.Add(self.map_panel, 1, wx.EXPAND)
+        self.map_sizer.Add(self.map_panel, 2, wx.EXPAND)
         self.map_sizer.Add(0, 5, 0)
         self.map_sizer.Add(self.button_panel, 1, wx.EXPAND)
-        self.frame_sizer.Add(self.map_sizer, 1, wx.EXPAND | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
+        self.frame_sizer.Add(self.map_sizer, 2, wx.EXPAND | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
 
         self.frame_vsizer = wx.BoxSizer(wx.VERTICAL)
         self.frame_vsizer.Add(self.frame_sizer, 3, wx.EXPAND)
@@ -75,11 +75,12 @@ class MyFrame(wx.Frame):
         ###Bind functions to the X button for properly closing the frame
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
-        ###Input Binding
+        ##### Input Bindings #####
         self.gpe = GamePadEvents(self)
         self.Bind(self.gpe.EVT_GPButton, self.OnXBoxButton)
-        self.Bind(self.gpe.EVT_GPRStickX, self.OnXBoxRStickX)
-        self.Bind(self.gpe.EVT_GPRStickY, self.OnXBoxRStickY)
+        self.Bind(self.gpe.EVT_GPDPad, self.OnXBoxDPad)
+        self.Bind(self.gpe.EVT_GPRStick, self.OnXBoxRStick)
+        self.Bind(self.gpe.EVT_GPLStick, self.OnXBoxLStick)
         self.Bind(self.gpe.EVT_GPLTrigger, self.OnXBoxLTrigger)
         self.Bind(self.gpe.EVT_GPRTrigger, self.OnXBoxRTrigger)
 
@@ -118,8 +119,6 @@ class MyFrame(wx.Frame):
 
         #Set the Menu Bar to the frame for display
         self.SetMenuBar(menu_bar)
-
-        self.Bind(wx.EVT_JOYSTICK_EVENTS, self.onJoyEvent)
 
     def onJoyEvent(self, event):
         print("Joystick event")
@@ -160,11 +159,24 @@ class MyFrame(wx.Frame):
             print ("y was pressed")
             #self.camera_panel.StartPlayer("R\\video.mov")
     
-    def OnXBoxRStickX(self, event):
-        print("X: " + str(event.x))
+    def OnXBoxDPad(self, e):
+        if (e.direction == 'up'):
+            print("Dpad: up")
+        elif (e.direction == 'down'):
+            print("Dpad: down")
+        elif (e.direction == 'left'):
+            print("Dpad: left")
+        elif (e.direction == 'right'):
+            print("Dpad: right")
+        
     
-    def OnXBoxRStickY(self, event):
-        print("Y: " + str(event.y))
+    def OnXBoxRStick(self, event):
+        print("X: " + str(event.x))
+        #self.map_panel.updateRoverPosition(event.x * 200 + 200, event.y * -200 + 200)
+    
+    def OnXBoxLStick(self, event):
+        print("X: " + str(event.x))
+        self.map_panel.updateRoverPosition(event.x * 200 + 200, event.y * -200 + 200)
     
     def OnXBoxLTrigger(self, event):
         print("LT: " + str(event.value))

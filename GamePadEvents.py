@@ -12,10 +12,12 @@ import time
 
 class GamePadEvents:
     def __init__(self, frame):
+        ##### Create the Events #####
         self.ButtonEvent, self.EVT_GPButton = wx.lib.newevent.NewEvent()
+        self.DPadEvent, self.EVT_GPDPad = wx.lib.newevent.NewEvent()
 
-        self.RStickXEvent, self.EVT_GPRStickX = wx.lib.newevent.NewEvent()
-        self.RStickYEvent, self.EVT_GPRStickY = wx.lib.newevent.NewEvent()
+        self.RStickEvent, self.EVT_GPRStick = wx.lib.newevent.NewEvent()
+        self.LStickEvent, self.EVT_GPLStick = wx.lib.newevent.NewEvent()
 
         self.LTriggerEvent, self.EVT_GPLTrigger = wx.lib.newevent.NewEvent()
         self.RTriggerEvent, self.EVT_GPRTrigger = wx.lib.newevent.NewEvent()
@@ -31,6 +33,11 @@ class GamePadEvents:
         self.sensetivity = .02
         self.RStickXValue = 0
         self.RStickYValue = 0
+
+        self.LStickXValue = 0
+        self.LStickYValue = 0
+        
+        ##### Start Thread #####
         self.thread = threading.Thread(target=self.ListenForInputs)
         self.thread.start()
 
@@ -58,8 +65,9 @@ class GamePadEvents:
             #time.sleep(.01)
             events = inputs.get_gamepad()
             for evt in events:
+
+                ### A, B, X, Y BUTTONS ###
                 if (evt.code == 'BTN_SOUTH'):
-                    #print(evt.state)
                     if (evt.state == 1):
                         wx.PostEvent(self.target, self.ButtonEvent(button = 'a'))
                 elif (evt.code == 'BTN_EAST'):
@@ -71,14 +79,39 @@ class GamePadEvents:
                 elif (evt.code == 'BTN_NORTH'):
                     if (evt.state == 1):
                         wx.PostEvent(self.target, self.ButtonEvent(button = 'y'))
+
+                ### D-PAD BUTTONS ###
+                elif (evt.code == 'ABS_HAT0X'):
+                    if (evt.state == 1):
+                        wx.PostEvent(self.target, self.DPadEvent(direction = 'right'))
+                    elif (evt.state == -1):
+                        wx.PostEvent(self.target, self.DPadEvent(direction = 'left'))
+                elif (evt.code == 'ABS_HAT0Y'):
+                    if (evt.state == 1):
+                        wx.PostEvent(self.target, self.DPadEvent(direction = 'down'))
+                    elif (evt.state == -1):
+                        wx.PostEvent(self.target, self.DPadEvent(direction = 'up'))
+
+                ### RIGHT STICK ###
                 elif evt.code == "ABS_RX":
                     if self.stickMap(-1, 1, evt.state) > self.RStickXValue + self.sensetivity or self.stickMap(-1, 1, evt.state) < self.RStickXValue - self.sensetivity:
                         self.RStickXValue = self.stickMap(-1, 1, evt.state)
-                        wx.PostEvent(self.target, self.RStickXEvent(x = self.RStickXValue))
+                        wx.PostEvent(self.target, self.RStickEvent(x = self.RStickXValue, y = self.RStickYValue))
                 elif evt.code == "ABS_RY":
                     if self.stickMap(-1, 1, evt.state) > self.RStickYValue + self.sensetivity or self.stickMap(-1, 1, evt.state) < self.RStickYValue - self.sensetivity:
                         self.RStickYValue = self.stickMap(-1, 1, evt.state)
-                        wx.PostEvent(self.target, self.RStickYEvent(y = self.RStickYValue))
+                        wx.PostEvent(self.target, self.RStickEvent(x = self.RStickXValue, y = self.RStickYValue))
+
+                elif evt.code == "ABS_X":
+                    if self.stickMap(-1, 1, evt.state) > self.LStickXValue + self.sensetivity or self.stickMap(-1, 1, evt.state) < self.LStickXValue - self.sensetivity:
+                        self.LStickXValue = self.stickMap(-1, 1, evt.state)
+                        wx.PostEvent(self.target, self.LStickEvent(x = self.LStickXValue, y = self.LStickYValue))
+                elif evt.code == "ABS_Y":
+                    if self.stickMap(-1, 1, evt.state) > self.LStickYValue + self.sensetivity or self.stickMap(-1, 1, evt.state) < self.LStickYValue - self.sensetivity:
+                        self.LStickYValue = self.stickMap(-1, 1, evt.state)
+                        wx.PostEvent(self.target, self.LStickEvent(x = self.LStickXValue, y = self.LStickYValue))
+
+                ### TRIGGERS ###
                 elif evt.code == "ABS_Z":
                     wx.PostEvent(self.target, self.LTriggerEvent(value = self.triggerMap(0, 1, evt.state)))
                 elif evt.code == "ABS_RZ":
